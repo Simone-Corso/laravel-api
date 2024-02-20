@@ -30,7 +30,22 @@ class ProjectController extends Controller
             ]);
     }
 
-    public function search () {
-        return 'search';
+    public function search (Request $request ) {
+        $data = $request->all();
+        if ( isset ($data ['name'])){
+            $stringa = $data ['name'];
+           
+
+            $project = Project::where('title', 'like', "%{$stringa}%")->get();
+            
+            return response()->json(
+                [
+                    "success" => true,
+                    "result" => $project,
+                    "matches" => count($project)
+                ]);
+        } else {
+            abort(404);
+        }
     }
 }
