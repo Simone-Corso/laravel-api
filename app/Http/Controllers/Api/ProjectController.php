@@ -6,11 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Project;
 
+
 class ProjectController extends Controller
 {
     public function index() {
 
-        $projects = Project::all();
+        $projects = Project::with('type','technologies')->paginate(3);
 
         return response()->json(
             [
@@ -34,18 +35,22 @@ class ProjectController extends Controller
         $data = $request->all();
         if ( isset ($data ['name'])){
             $stringa = $data ['name'];
-           
-
+        
             $project = Project::where('title', 'like', "%{$stringa}%")->get();
             
-            return response()->json(
-                [
-                    "success" => true,
-                    "result" => $project,
-                    "matches" => count($project)
-                ]);
-        } else {
+        } elseif (is_null ($data ['name'])) {
+            $project = Project::All();
+        } 
+        
+        else {
             abort(404);
         }
+
+        return response()->json(
+            [
+                "success" => true,
+                "result" => $project,
+                "matches" => count($project)
+            ]);
     }
 }
